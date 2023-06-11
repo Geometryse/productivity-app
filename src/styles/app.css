@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+p,
+h1,
+input,
+button {
+	font-family: sans-serif;
+}
