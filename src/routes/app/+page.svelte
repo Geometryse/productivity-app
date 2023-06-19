@@ -1,15 +1,30 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import Task from './Task.svelte';
+	import StartingTime from './StartingTime.svelte';
+	import Input from '../../components/ui/Input.svelte';
 	import { format } from '../../util';
 	type ErrorPortion = 'name' | 'duration' | '';
 	let name = '';
-	let duration = 0;
+	let duration: number | null = null;
 	let errorText = '';
 	let errorPortion: ErrorPortion = '';
 	let copied = false;
 	let grabbing = false;
 	let containerWidth: number;
-	const startTime = Date.now();
+	let startTime = Date.now();
+
+	// Update start time every second...
+	let startTimeInterval = setInterval(() => {
+		startTime = Date.now();
+	}, 1000);
+	// ... until first task is appended...
+	$: tasks[0] && clearInterval(startTimeInterval);
+	// ...or component is destroyed
+	onDestroy(() => {
+		clearInterval(startTimeInterval);
+	});
+
 	let tasks: App.Task[] = [
 		// {
 		// 	name: 'Example task',
@@ -44,6 +59,11 @@
 			errorPortion = 'name';
 			return;
 		}
+		if (duration === null) {
+			errorText = 'Duration cannot be empty and must be a number.';
+			errorPortion = 'duration';
+			return;
+		}
 		if (duration <= 0) {
 			errorText = 'Duration must be greater than 0.';
 			errorPortion = 'duration';
@@ -60,15 +80,15 @@
 		const id = Date.now();
 		tasks.push({ name, begin, end, duration, id });
 		tasks = tasks;
-		// console.log(tasks);
 		name = '';
-		duration = 0;
+		duration = null;
 	}
 	function copySchedule() {
 		copied = true;
 		let text = '';
 		for (const { name, begin, end, duration } of tasks) {
-			text += `\n${format(begin)} – ${format(end)} (${duration} mins): ${name}`;
+			const plural = !(duration === 1) ? 's' : '';
+			text += `${format(begin)} – ${format(end)} (${duration} min${plural}): ${name}\n`;
 		}
 		navigator.clipboard.writeText(text);
 	}
@@ -83,38 +103,33 @@
 </script>
 
 <main class="grid grid-cols-2 gap-4 justify-center w-full h-screen bg-[#101010]">
-	<div class="flex flex-col justify-center items-center w-full h-full">
-		<div class="grid grid-cols-4 p-4 max-w-xl gap-2">
-			<input
-				type="text"
-				bind:value={name}
-				class="p-2 text-lg rounded border-2 border-gray-800 bg-gray-900 col-span-3 {errorPortion ===
-				'name'
-					? 'border-red-700 border-2'
-					: ''}"
-				placeholder="Name"
-			/>
-			<input
-				type="number"
-				bind:value={duration}
-				class="p-2 text-lg rounded border-2 border-gray-800 bg-gray-900 col-span-1 {errorPortion ===
-				'duration'
-					? 'border-red-700 border-2'
-					: ''}"
-				placeholder="Minutes"
-			/>
-			<!-- <div class="flex-grow grid grid-cols-4" /> -->
-			<button
-				class="rounded text-lg font-bold transition duration-75 hover:bg-gray-800 bg-gray-900 p-2 border-2 border-gray-800 col-span-4"
-				on:click={addTask}>Add Task</button
-			>
-			<button
-				on:click={copySchedule}
-				class="my-3 col-span-4 rounded text-lg font-bold transition duration-75 hover:bg-gray-800 bg-gray-900 p-2 border-2 border-gray-800"
-				>{copied ? 'Copied!' : 'Copy schedule'}</button
-			>
+	<div class="flex flex-col justify-center items-center w-full h-full p-4 space-y-3">
+		{#if !tasks[0]}
+			<div><p class="text-xl">Initial Start Time: <StartingTime bind:startTime /></p></div>
+		{:else}
+			<div>
+				<p class="text-xl">
+					Next Start Time: {format(tasks[tasks.length - 1].end + (duration || 0) * 60 * 1000)}
+				</p>
+			</div>
+		{/if}
+		<div class="max-w-xl grid grid-cols-4 w-full gap-2">
+			<div class="col-span-3 p-2">
+				<Input type="text" bind:value={name} placeholder="Name" />
+			</div>
+			<div class="col-span-1 p-2">
+				<Input type="number" unit="min" absolute={true} bind:value={duration} placeholder="Dur." />
+			</div>
 		</div>
-
+		<button
+			class="w-full max-w-xl rounded text-lg font-bold transition duration-75 hover:bg-gray-800 bg-gray-900 p-2 border-2 border-gray-800 col-span-4"
+			on:click={addTask}>Add Task</button
+		>
+		<button
+			on:click={copySchedule}
+			class="w-full max-w-xl col-span-4 rounded text-lg font-bold transition duration-75 hover:bg-gray-800 bg-gray-900 p-2 border-2 border-gray-800"
+			>{copied ? 'Copied!' : 'Copy schedule'}</button
+		>
 		<p class="text-sm text-red-600 font-bold">{errorText}</p>
 	</div>
 	<div
@@ -133,9 +148,5 @@
 <style>
 	* {
 		color: rgb(226, 226, 226);
-	}
-	input[type='number'] {
-		-moz-appearance: textfield;
-		appearance: textfield;
 	}
 </style>

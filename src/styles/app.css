@@ -7,3 +7,10 @@ input,
 button {
 	font-family: sans-serif;
 }
+input:focus {
+	outline: none;
+}
+input[type='number'] {
+	-moz-appearance: textfield;
+	appearance: textfield;
+}
