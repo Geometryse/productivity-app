@@ -9,7 +9,8 @@
 	let duration: number | null = null;
 	let errorText = '';
 	let errorPortion: ErrorPortion = '';
-	let copied = false;
+	let copied = false,
+		copiedJSON = false;
 	let grabbing = false;
 	let containerWidth: number;
 	let startTime = Date.now();
@@ -51,6 +52,7 @@
 
 	function addTask() {
 		copied = false;
+		copiedJSON = false;
 		errorText = '';
 		errorPortion = '';
 		// Error Handling
@@ -84,15 +86,20 @@
 		duration = null;
 	}
 	function copySchedule() {
-		copied = true;
 		let text = '';
 		for (const { name, begin, end, duration } of tasks) {
 			const plural = !(duration === 1) ? 's' : '';
 			text += `${format(begin)} – ${format(end)} (${duration} min${plural}): ${name}\n`;
 		}
 		navigator.clipboard.writeText(text);
+		copiedJSON = false;
+		copied = true;
 	}
-
+	function copyJSON() {
+		navigator.clipboard.writeText(JSON.stringify(tasks));
+		copiedJSON = true;
+		copied = false;
+	}
 	function handleGrab(event: CustomEvent<number>) {
 		grabbing = true;
 	}
@@ -129,6 +136,11 @@
 			on:click={copySchedule}
 			class="w-full max-w-xl col-span-4 rounded text-lg font-bold transition duration-75 hover:bg-gray-800 bg-gray-900 p-2 border-2 border-gray-800"
 			>{copied ? 'Copied!' : 'Copy schedule'}</button
+		>
+		<button
+			on:click={copyJSON}
+			class="w-full max-w-xl col-span-4 rounded text-lg font-bold transition duration-75 hover:bg-gray-800 bg-gray-900 p-2 border-2 border-gray-800"
+			>{copiedJSON ? 'Copied!' : 'Copy schedule to JSON'}</button
 		>
 		<p class="text-sm text-red-600 font-bold">{errorText}</p>
 	</div>
