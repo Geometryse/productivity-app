@@ -112,7 +112,7 @@
 			{#if !tasks[0]}
 				<div>
 					<p class="text-xl">
-						Initial Start Time:{format(UTCToTotalMinutes(startTime), use24HourTime)}
+						Initial Start Time: {format(UTCToTotalMinutes(startTime), use24HourTime)}
 					</p>
 				</div>
 			{/if}
