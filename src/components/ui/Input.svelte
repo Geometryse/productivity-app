@@ -39,6 +39,7 @@
 				: 'placeholder:text-slate-400 text-slate-300'}"
 			{placeholder}
 			type="number"
+			on:keydown={(e) => e.key === '.' && e.preventDefault()}
 			on:focus={onFocus}
 			on:blur={onBlur}
 			min={absolute ? '0' : undefined}

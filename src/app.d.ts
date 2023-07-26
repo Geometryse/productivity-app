@@ -7,7 +7,6 @@ declare global {
 			begin: number;
 			end: number;
 			duration: number; // in minutes
-			id: number;
 		}
 		// interface Error {}
 		// interface Locals {}

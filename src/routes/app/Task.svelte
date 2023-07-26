@@ -4,7 +4,7 @@
 
 	export let task: App.Task;
 	export let containerWidth: number;
-
+	export let use24HourTime: boolean;
 	let grabbingthis = false;
 	// export let grabbing:boolean
 	let x = 0;
@@ -18,7 +18,7 @@
 		y = e.pageY - 36;
 		grabbingthis = true;
 		console.log(x, y);
-		dispatch('grab', task.id);
+		// dispatch('grab', task.id);
 
 		setTimeout(() => {}, 200);
 	}
@@ -30,7 +30,7 @@
 	function handleMouseup() {
 		// Disable outlines; re-enable "Copy scheldule"
 		grabbingthis = false;
-		dispatch('release', task.id);
+		// dispatch('release', task.id);
 	}
 </script>
 
@@ -38,7 +38,7 @@
 	<div class="h-12 w-full" />
 {/if}
 <div
-	class="flex items-center rounded-lg text-white gap-3 flex-nowrap bg-gray-900 overflow-hidden transform h-12 transition-transform {grabbingthis
+	class="flex my-2 items-center rounded-lg text-white gap-3 flex-nowrap bg-gray-900 overflow-hidden transform h-12 transition-transform {grabbingthis
 		? 'cursor-grabbing duration-0'
 		: ' duration-150 ease-in-out'}"
 	style={grabbingthis
@@ -46,19 +46,20 @@
 				containerWidth - 24
 		  }px; cursor:grabbing!important`
 		: ''}
-	on:mousemove={handleMousemove}
-	on:mouseup={handleMouseup}
 >
-	<div class="flex bg-gray-800 h-full items-center">
-		<div
-			class="p-4 h-12 w-6 flex items-center justify-center cursor-grab"
+	<div
+		class="flex bg-gray-800 h-full items-center justify-center"
+		style={use24HourTime ? 'width:130px' : 'width: 192px'}
+	>
+		<!-- <div
+			class="p-4 h-12 flex items-center justify-center cursor-grab"
 			on:mousedown={handleMousedown}
 		>
-			<iconify-icon icon="tabler:grip-vertical" />
-		</div>
+		<iconify-icon icon="tabler:grip-vertical" /> 
+		</div> -->
 		<div class="flex items-center h-full cursor-pointer">
-			<p class="font-bold whitespace-nowrap pr-3">
-				{format(task.begin)} – {format(task.end)}
+			<p class="font-bold whitespace-nowrap px-3">
+				{format(task.begin, use24HourTime)} – {format(task.end, use24HourTime)}
 			</p>
 		</div>
 	</div>
