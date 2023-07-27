@@ -63,7 +63,7 @@
 		}
 		// Success, push to tasks
 		const begin = tasks.length > 0 ? tasks[tasks.length - 1].end : UTCToTotalMinutes(startTime);
-		const end = begin + duration;
+		const end = (begin + duration) % 1440;
 		// const id = Date.now();
 		tasks.push({ name, begin, end, duration });
 		tasks = tasks;
