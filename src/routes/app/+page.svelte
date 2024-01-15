@@ -165,6 +165,7 @@
 				/>
 			</label>
 		</div>
+		<a href="https://fluxflow.vercel.app/app" target="_blank" class="underline">Import JSON to a live timer here</a>
 		<div class="flex-1">
 			<p class="text-sm !text-red-600 font-bold">{errorText}</p>
 		</div>
